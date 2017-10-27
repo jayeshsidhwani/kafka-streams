@@ -1,0 +1,3 @@
+- Simple Map Reduce
+- Top searches in last minute
+- Deterioration in stream quality
