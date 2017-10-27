@@ -6,15 +6,16 @@ import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.kstream.*;
 
 import java.util.Properties;
+import java.util.function.IntUnaryOperator;
 
 /**
  * Created by jayeshsidhwani on 27/10/17.
  */
 public class LocationLatencyStream {
-    final private static String sourceTopic = "location-wise-latency";
-    final private static String akamaiSourceTopic = "akamai-location-wise-latency";
-    final private static String destinationTopic = "location-latency-summary";
-    final private static String appId = "hotstar.demo.streams.location_latency";
+    final private static String sourceTopic = "location-wise-stream-quality";
+    final private static String akamaiSourceTopic = "akamai-benchmark-stream-quality";
+    final private static String destinationTopic = "locations-with-low-qos";
+    final private static String appId = "hotstar.demo.streams.location_qos-2";
     final private static String consumerId = appId + ".client-1";
 
     public static void main(String[] args) throws Exception {
@@ -38,27 +39,25 @@ public class LocationLatencyStream {
         KStreamBuilder builder = new KStreamBuilder();
 
         final KStream<Integer, Integer> input = builder.stream(sourceTopic);
-        final KStream<Integer, Integer> akamaiLow = builder.stream(akamaiSourceTopic);
+        final KTable<Integer, Integer> akamaiLow = builder.table(akamaiSourceTopic);
 
-        final KTable<Integer, Integer> incomingStreamRates = input
-                .groupByKey()
-                .reduce((v1, v2) -> v1 > v2 ? v2 : v1);
+        KStream<Integer, Integer> inferiorStream = input
+                .join(akamaiLow,
+                        (value1, value2) -> {
+                            if (value1 < value2) {
+                                return value1;
+                            } else
+                                return null;
+                        });
 
-        final KTable<> lowerThanBenchmark = incomingStreamRates.join(akamaiLow,
-                (streamRate, benchmarkStreamRate) -> {
-                    if (streamRate < benchmarkStreamRate)
-                        return
-                }
-
-        )
-//        final KTable<Windowed<String>, AvgValue> locationAverage = input
-//                .groupByKey()
-//                .<String, AvgValue>aggregate(
-//                        () -> new AvgAggregator<String, Integer, AvgValue>(),
-//                        TimeWindows.of(10000),
-//                        Serdes.String(), new AvgValueSerializer());
-//
+        inferiorStream
+                .filterNot((k, v) -> v == null)
+                .to(destinationTopic);
 
         return builder;
+    }
+
+    static Integer check(Integer left, Integer right) {
+        return left;
     }
 }
