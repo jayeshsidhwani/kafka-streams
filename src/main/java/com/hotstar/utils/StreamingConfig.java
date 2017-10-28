@@ -13,7 +13,7 @@ public class StreamingConfig {
 
     final private static String StateDirConfig = "/tmp/kafka-com.hotstar.streams";
     final private static String AutoOffsetResetConfig = "earliest";
-    final private static Integer CommitIntervalMS = 10 * 1000;
+    final private static Integer CommitIntervalMS = 2 * 1000;
 
 
     public static Properties GetConfig(String bootstrapServers,

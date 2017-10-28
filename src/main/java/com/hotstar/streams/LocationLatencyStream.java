@@ -5,6 +5,7 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.kstream.*;
 
+import java.sql.Time;
 import java.util.Properties;
 import java.util.function.IntUnaryOperator;
 
@@ -41,15 +42,21 @@ public class LocationLatencyStream {
         final KStream<Integer, Integer> input = builder.stream(sourceTopic);
         final KTable<Integer, Integer> akamaiLow = builder.table(akamaiSourceTopic);
 
-        KStream<Integer, Integer> inferiorStream = input
+        KStream<Windowed<Integer>, Integer> twoSecondLow = input
+                .groupByKey()
+                .reduce((v1, v2) -> v1 > v2 ? v1 : v2, TimeWindows.of(2 * 1000L), "min-quality")
+                .toStream();
+
+        KStream<Integer, Integer> inferiorStream  = twoSecondLow
+                .selectKey((k, v) -> k.key())
                 .join(akamaiLow,
                         (value1, value2) -> {
                             if (value1 < value2) {
                                 return value1;
-                            } else
+                            } else {
                                 return null;
+                            }
                         });
-
         inferiorStream
                 .filterNot((k, v) -> v == null)
                 .to(destinationTopic);

@@ -6,6 +6,7 @@ import org.apache.kafka.common.serialization.IntegerSerializer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 public class AkamaiLocationBenchmarkProducer {
 
@@ -26,16 +27,41 @@ public class AkamaiLocationBenchmarkProducer {
         locationBenchmarks.put(5, 620);
         locationBenchmarks.put(6, 120);
 
-        for (Map.Entry<Integer, Integer> entry : locationBenchmarks.entrySet()) {
-            Integer key = entry.getKey();
-            Integer value = entry.getValue();
+        final HashMap<Integer, Integer> newLocationBenchmarks = new HashMap<Integer, Integer>();
+        newLocationBenchmarks.put(1, 230);
+        newLocationBenchmarks.put(2, 840);
+        newLocationBenchmarks.put(3, 180);
+        newLocationBenchmarks.put(4, 68);
+        newLocationBenchmarks.put(5, 920);
+        newLocationBenchmarks.put(6, 520);
 
-            final ProducerRecord<Integer, Integer> record = new ProducerRecord<Integer, Integer>(sourceTopic, key, value);
-            RecordMetadata metadata = producer.send(record).get();
+        for (Integer i = 0; i < Integer.MAX_VALUE; i++) {
+            for (Map.Entry<Integer, Integer> entry : locationBenchmarks.entrySet()) {
+                Integer key = entry.getKey();
+                Integer value = entry.getValue();
 
-            System.out.printf("sent record(key=%s value=%s) meta(partition=%d, offset=%d)\n",
-                    record.key(), record.value(), metadata.partition(), metadata.offset());
+                final ProducerRecord<Integer, Integer> record = new ProducerRecord<Integer, Integer>(sourceTopic, key, value);
+                RecordMetadata metadata = producer.send(record).get();
+
+                System.out.printf("Location %s reported a benchmark of %s\n",
+                        record.key(), record.value());
+            }
+
+            TimeUnit.SECONDS.sleep(7);
+
+            for (Map.Entry<Integer, Integer> entry : newLocationBenchmarks.entrySet()) {
+                Integer key = entry.getKey();
+                Integer value = entry.getValue();
+
+                final ProducerRecord<Integer, Integer> record = new ProducerRecord<Integer, Integer>(sourceTopic, key, value);
+                RecordMetadata metadata = producer.send(record).get();
+
+                System.out.printf("sent record(key=%s value=%s) meta(partition=%d, offset=%d)\n",
+                        record.key(), record.value(), metadata.partition(), metadata.offset());
+            }
         }
+        TimeUnit.SECONDS.sleep(7);
+
     }
 
     private static Producer<Integer, Integer> getProducer(String bootstrapServers) {
