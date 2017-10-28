@@ -16,7 +16,7 @@ public class SearchTermProducer {
     final private static String destinationTopic = "popular-search-terms-output.temp";
     final private static String appId = "hotstar.demo.streams.popular_search";
     final private static String consumerId = appId + ".client-1";
-    final private static String[] searchTerms = new String[] {
+    final private static String[] searchTerms = new String[]{
             "sarabhai-vs-sarabhai",
             "ipl                 ",
             "mumbai-indians      ",
@@ -37,8 +37,7 @@ public class SearchTermProducer {
                     new ProducerRecord<Integer, String>(sourceTopic, i, searchTerms[randomIndex]);
 
             RecordMetadata metadata = producer.send(record).get();
-            System.out.printf("sent record(key=%s value=%s) meta(partition=%d, offset=%d)\n",
-                    record.key(), record.value(), metadata.partition(), metadata.offset());
+            System.out.printf("Someone searched %s\n", record.value());
 
             TimeUnit.MILLISECONDS.sleep(10);
         }
