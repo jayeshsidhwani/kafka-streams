@@ -39,7 +39,7 @@ public class SearchTermProducer {
             RecordMetadata metadata = producer.send(record).get();
             System.out.printf("Someone searched %s\n", record.value());
 
-            TimeUnit.MILLISECONDS.sleep(10);
+            TimeUnit.MILLISECONDS.sleep(200);
         }
     }
 

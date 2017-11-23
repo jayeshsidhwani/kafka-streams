@@ -32,7 +32,7 @@ public class LocationWiseStreamQualityProducer {
 
                 System.out.printf("Location %d reported a stream quality of %d\n", record.key(), record.value());
             }
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.MILLISECONDS.sleep(400);
         }
     }
 

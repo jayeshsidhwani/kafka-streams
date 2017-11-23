@@ -24,7 +24,8 @@ public class PopularSearchTermsStream {
                 appId,
                 consumerId,
                 Serdes.String().getClass().getName(),
-                Serdes.String().getClass().getName());
+                Serdes.String().getClass().getName(),
+                5 * 1000);
         KStreamBuilder builder = getStreamProcessorTopology();
 
         KafkaStreams stream = new KafkaStreams(builder, config);

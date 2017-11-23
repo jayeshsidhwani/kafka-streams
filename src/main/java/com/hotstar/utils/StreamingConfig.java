@@ -2,7 +2,6 @@ package com.hotstar.utils;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.common.serialization.Serdes;
 
 import java.util.Properties;
 
@@ -13,14 +12,13 @@ public class StreamingConfig {
 
     final private static String StateDirConfig = "/tmp/kafka-com.hotstar.streams";
     final private static String AutoOffsetResetConfig = "earliest";
-    final private static Integer CommitIntervalMS = 2 * 1000;
-
 
     public static Properties GetConfig(String bootstrapServers,
                                        String appId,
                                        String consumerId,
                                        String keySerdesKlass,
-                                       String valueSerdesKlass) {
+                                       String valueSerdesKlass,
+                                       Integer commitIntervalMS) {
         Properties props = new Properties();
 
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, appId);
@@ -30,7 +28,7 @@ public class StreamingConfig {
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, keySerdesKlass);
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, valueSerdesKlass);
         props.put(StreamsConfig.STATE_DIR_CONFIG, StateDirConfig);
-        props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, CommitIntervalMS);
+        props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, commitIntervalMS);
 
         return props;
     }

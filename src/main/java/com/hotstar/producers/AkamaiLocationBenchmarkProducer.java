@@ -56,8 +56,8 @@ public class AkamaiLocationBenchmarkProducer {
                 final ProducerRecord<Integer, Integer> record = new ProducerRecord<Integer, Integer>(sourceTopic, key, value);
                 RecordMetadata metadata = producer.send(record).get();
 
-                System.out.printf("sent record(key=%s value=%s) meta(partition=%d, offset=%d)\n",
-                        record.key(), record.value(), metadata.partition(), metadata.offset());
+                System.out.printf("Location %s reported a benchmark of %s\n",
+                        record.key(), record.value());
             }
         }
         TimeUnit.SECONDS.sleep(7);

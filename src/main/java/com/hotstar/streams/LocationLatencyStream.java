@@ -26,7 +26,8 @@ public class LocationLatencyStream {
                 appId,
                 consumerId,
                 Serdes.Integer().getClass().getName(),
-                Serdes.Integer().getClass().getName());
+                Serdes.Integer().getClass().getName(),
+                5 * 1000);
         KStreamBuilder builder = getStreamProcessorTopology();
 
         KafkaStreams stream = new KafkaStreams(builder, config);
